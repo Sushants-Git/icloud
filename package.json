@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check-types": "tsc --noEmit",
     "build": "next build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -46,9 +47,11 @@
     "prettier": "^3.3.2",
     "prettier-plugin-tailwindcss": "^0.6.5",
     "tailwindcss": "^3.4.3",
+    "turbo": "^2.1.1",
     "typescript": "^5.5.3"
   },
   "ct3aMetadata": {
     "initVersion": "7.37.0"
-  }
+  },
+  "packageManager": "bun@1.1.26"
 }
