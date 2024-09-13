@@ -8,6 +8,7 @@ import {
     text,
     timestamp,
     varchar,
+    boolean,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -34,9 +35,9 @@ export const posts = createTable(
             () => new Date(),
         ),
     },
-    (example) => ({
-        createdByIdIdx: index("created_by_idx").on(example.createdById),
-        nameIndex: index("name_idx").on(example.name),
+    (post) => ({
+        createdByIdIdx: index("created_by_idx").on(post.createdById),
+        nameIndex: index("name_idx").on(post.name),
     }),
 );
 
@@ -53,6 +54,28 @@ export const users = createTable("user", {
     }).default(sql`CURRENT_TIMESTAMP`),
     image: varchar("image", { length: 255 }),
 });
+
+export const authenticator = createTable(
+    "authenticator",
+    {
+        id: serial("id").primaryKey(),
+        credentialID: varchar("credential_id").notNull(),
+        userId: varchar("user_id")
+            .notNull()
+            .references(() => users.id, { onDelete: "cascade" }),
+        providerAccountId: varchar("provider_account_id").notNull(),
+        credentialPublicKey: varchar("credential_public_key").notNull(),
+        counter: integer("counter").notNull(),
+        credentialDeviceType: varchar("credential_device_type").notNull(),
+        credentialBackedUp: boolean("credential_backed_up").notNull(),
+        transports: varchar("transports"),
+    },
+    (authenticator) => ({
+        creadentialIdIdx: index("authenticator_credentialid_idx").on(
+            authenticator.credentialID,
+        ),
+    }),
+);
 
 export const usersRelations = relations(users, ({ many }) => ({
     accounts: many(accounts),
