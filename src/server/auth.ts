@@ -1,8 +1,12 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import NextAuth from "next-auth";
-import getServerSession, { NextAuthConfig, type DefaultSession } from "next-auth";
+import getServerSession, {
+    NextAuthConfig,
+    type DefaultSession,
+} from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import Passkey from "next-auth/providers/passkey";
+import GitHub from "next-auth/providers/github";
 
 import { db } from "~/server/db";
 import {
@@ -10,7 +14,7 @@ import {
     sessions,
     users,
     verificationTokens,
-    authenticator
+    authenticator,
 } from "~/server/db/schema";
 
 declare module "next-auth" {
@@ -37,10 +41,18 @@ export const { auth, handlers } = NextAuth({
         accountsTable: accounts,
         sessionsTable: sessions,
         verificationTokensTable: verificationTokens,
-        authenticatorsTable: authenticator
+        authenticatorsTable: authenticator,
     }) as Adapter,
-    providers: [Passkey],
+    providers: [
+        Passkey,
+        // GitHub({
+        //     clientId: process.env.GITHUB_CLIENT_ID,
+        //     clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        // }),
+    ],
     experimental: { enableWebAuthn: true },
+    // providers: [Passkey, GitHub],
+    // experimental: { enableWebAuthn: true },
 });
 
 /**
