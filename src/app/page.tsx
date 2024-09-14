@@ -1,6 +1,5 @@
 import { db } from "~/server/db";
 import { api, HydrateClient } from "~/trpc/server";
-import { useSession } from "next-auth/react";
 import HomePage from "~/app/_components/HomePage";
 
 export const dynamic = "force-dynamic";

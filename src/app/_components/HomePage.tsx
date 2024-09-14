@@ -5,13 +5,12 @@ import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Loading from "./Loading";
 import NameDialog from "./NameDialog";
+import { useMemo } from "react";
 
 export default function HomePage() {
     const { data: session, update, status } = useSession();
 
-    console.log(session);
-
-    const renderContent = () => {
+    const renderedContent = useMemo(() => {
         if (status === "loading") {
             return <Loading />;
         }
@@ -29,11 +28,7 @@ export default function HomePage() {
         }
 
         return <Dashboard />;
-    };
+    }, [status, session]);
 
-    return (
-        <>
-            {renderContent()}
-        </>
-    );
+    return <>{renderedContent}</>;
 }

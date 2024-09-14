@@ -1,31 +1,60 @@
 import { CircleChevronRightIcon } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { useSession } from "next-auth/react";
+import { FormEvent, useRef, useState } from "react";
+import { api } from "~/trpc/react";
+import Loading from "./Loading";
 
 interface NameDialogProps {
     userId: string;
 }
 
 const NameDialog: React.FC<NameDialogProps> = ({ userId }) => {
-    const [name, setName] = useState('');
+    const [name, setName] = useState("");
+    const [loading, setLoading] = useState(false);
+    const retryCount = useRef(0);
+    const { update } = useSession();
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const addNameMutation = api.user.addName.useMutation({
+        onMutate: () => {
+            setLoading(true);
+        },
+        onSuccess: async (_, variables) => {
+            const { name } = variables;
+            await update();
+            console.log(name);
+            setName("");
+            setLoading(false);
+        },
+        onError: async () => {
+            if (retryCount.current < 2) {
+                retryCount.current += 1;
+                await addNameMutation.mutateAsync({ userId, name });
+            } else {
+                console.error("Failed to add name after retries.");
+            }
+            setLoading(false);
+        },
+    });
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-
-        if (name.trim()) {
-            console.log('Name submitted:', name);
-        }
+        await addNameMutation.mutateAsync({ userId, name });
     };
 
+    if (loading) {
+        return <Loading />;
+    }
+
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
+            <div className="w-full max-w-md rounded-lg bg-white shadow-lg">
                 <div className="p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">Hey there! 👋</h2>
-                    <p className="text-gray-600 mb-6">
-                        Hey! It looks like this is your first time here.
-                        To get started, please enter your name below. This helps us
-                        personalize your experience.
+                    <h2 className="mb-2 text-xl font-semibold text-gray-900">
+                        Hey there! 👋
+                    </h2>
+                    <p className="mb-6 text-gray-600">
+                        It looks like this is your first time here. To get started, please
+                        enter your name below. This helps us personalize your experience.
                     </p>
                     <form onSubmit={handleSubmit} className="relative">
                         <input
