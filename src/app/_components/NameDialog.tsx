@@ -2,10 +2,10 @@ import { CircleChevronRightIcon } from "lucide-react";
 import { FormEvent, useState } from "react";
 
 interface NameDialogProps {
-    nameId: string;
+    userId: string;
 }
 
-const NameDialog: React.FC<NameDialogProps> = ({ nameId }) => {
+const NameDialog: React.FC<NameDialogProps> = ({ userId }) => {
     const [name, setName] = useState('');
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {

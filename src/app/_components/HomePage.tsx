@@ -11,16 +11,29 @@ export default function HomePage() {
 
     console.log(session);
 
+    const renderContent = () => {
+        if (status === "loading") {
+            return <Loading />;
+        }
+
+        if (status === "unauthenticated") {
+            return <Login />;
+        }
+
+        if (!session) {
+            return null;
+        }
+
+        if (session.user.name === null) {
+            return <NameDialog userId={session.user.id} />;
+        }
+
+        return <Dashboard />;
+    };
+
     return (
         <>
-            {status === "loading" ? (
-                <Loading />
-            ) : status === "unauthenticated" ? (
-                <Login />
-            ) : (
-                session?.user.name === null ? <NameDialog userId={session?.user.id} /> :
-                    <Dashboard />
-            )}
+            {renderContent()}
         </>
     );
 }
