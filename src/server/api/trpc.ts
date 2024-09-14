@@ -9,7 +9,7 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { OpenApiMeta } from 'trpc-openapi';
+import { OpenApiMeta } from 'better-trpc-openapi';
 import { ZodError } from "zod";
 
 import { getServerAuthSession } from "~/server/auth";
