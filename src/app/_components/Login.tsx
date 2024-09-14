@@ -36,10 +36,12 @@ function InputField() {
         setInputValue(e.target.value);
     };
 
-    const handleButtonClick = async (e: MouseEvent<HTMLButtonElement>): Promise<void> => {
+    const handleButtonClick = async (
+        e: MouseEvent<HTMLButtonElement>,
+    ): Promise<void> => {
         e.preventDefault();
         try {
-            let res = await signIn("passkey", { action: "login", email: inputValue });
+            let res = await signIn("passkey", { email: inputValue, redirect: false });
             console.log(res);
         } catch (err) {
             console.log(err);
@@ -69,9 +71,24 @@ function InputField() {
 }
 
 function PasskeyLogin() {
+    const handleButtonClick = async (
+        e: MouseEvent<HTMLButtonElement>,
+    ): Promise<void> => {
+        e.preventDefault();
+        try {
+            const res = await signIn("passkey", { redirect: false });
+            console.log(res);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     return (
         <div className="mx-auto w-full max-w-md p-4">
-            <button className="w-full rounded-custom border border-gray-400 px-4 py-4 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+            <button
+                className="w-full rounded-custom border border-gray-400 px-4 py-4 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                onClick={handleButtonClick}
+            >
                 Sign in with passkey
             </button>
         </div>
