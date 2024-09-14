@@ -9,10 +9,14 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import { OpenApiMeta } from 'trpc-openapi';
 import { ZodError } from "zod";
 
 import { getServerAuthSession } from "~/server/auth";
 import { db } from "~/server/db";
+
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
+
 
 /**
  * 1. CONTEXT
@@ -26,13 +30,16 @@ import { db } from "~/server/db";
  *
  * @see https://trpc.io/docs/server/context
  */
+
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+    const headers: Headers = opts.headers;
+
     const session = await getServerAuthSession();
 
     return {
         db,
         session,
-        ...opts,
+        ...opts
     };
 };
 
@@ -43,7 +50,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-const t = initTRPC.context<typeof createTRPCContext>().create({
+const t = initTRPC.meta<OpenApiMeta>().context<typeof createTRPCContext>().create({
     transformer: superjson,
     errorFormatter({ shape, error }) {
         return {
@@ -101,6 +108,23 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
     return result;
 });
 
+const apiKeyValidationMiddleware = t.middleware(async ({ ctx, next, path }) => {
+    const skipValidationForProcedures = ['apiKey.getKey'];
+
+    const procedureName = path;
+
+    if (!procedureName || !skipValidationForProcedures.includes(procedureName)) {
+        const apiKey = ctx.headers.get('x-api-key');
+        const validApiKey = process.env.X_API_KEY ?? '';
+
+        if (!apiKey || apiKey !== validApiKey) {
+            throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid API Key" });
+        }
+    }
+
+    return await next();
+});
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -120,8 +144,8 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  */
 export const protectedProcedure = t.procedure
     .use(timingMiddleware)
+    .use(apiKeyValidationMiddleware)
     .use(({ ctx, next }) => {
-        console.log(ctx.session);
         if (!ctx.session || !ctx.session.user) {
             throw new TRPCError({ code: "UNAUTHORIZED" });
         }

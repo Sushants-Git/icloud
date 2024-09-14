@@ -14,14 +14,13 @@ const NameDialog: React.FC<NameDialogProps> = ({ userId }) => {
     const retryCount = useRef(0);
     const { update } = useSession();
 
+
     const addNameMutation = api.user.addName.useMutation({
         onMutate: () => {
             setLoading(true);
         },
-        onSuccess: async (_, variables) => {
-            const { name } = variables;
+        onSuccess: async (data) => {
             await update();
-            console.log(name);
             setName("");
             setLoading(false);
         },

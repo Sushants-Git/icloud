@@ -5,6 +5,7 @@ import { CircleChevronRightIcon } from "lucide-react";
 import { ChangeEvent, MouseEvent, useState } from "react";
 import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/webauthn";
+import { useApiKeyStore } from "~/stores/useApiKeyStore";
 
 export default function Login() {
     return (
