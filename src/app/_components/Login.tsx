@@ -41,7 +41,7 @@ function InputField() {
     ): Promise<void> => {
         e.preventDefault();
         try {
-            let res = await signIn("passkey", { email: inputValue, redirect: false });
+            const res = await signIn("passkey", { email: inputValue, redirect: false });
             console.log(res);
         } catch (err) {
             console.log(err);
