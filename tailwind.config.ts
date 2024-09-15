@@ -25,6 +25,7 @@ export default {
             },
             borderRadius: {
                 custom: "12px", // Define the custom border radius
+                customHalf: "10px", // Define the custom border radius
                 "custom-34": "34px", // Custom name for the border radius
             },
             colors: {

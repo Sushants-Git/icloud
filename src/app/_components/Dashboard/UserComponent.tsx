@@ -18,6 +18,13 @@ function UserPopup() {
     const [isOpen, setIsOpen] = useState(false);
     const { setLoading } = useLoadingStore();
 
+    const handleSignOut = () => {
+        setLoading(true);
+        signOut({ callbackUrl: "/" }).then(() => {
+            setLoading(false);
+        });
+    };
+
     return (
         <div className="relative">
             <UserIconNav
@@ -47,39 +54,38 @@ function UserPopup() {
                             </div>
                         </div>
 
-                        <div>
-                            <div className="-mb-2 ml-1 flex w-full items-center">
+                        <div className="px-1 pt-2">
+                            <div className="-mb-2 flex w-full items-center rounded-customHalf hover:bg-appleGray">
                                 <SettingsIcon
-                                    className="h-10 w-10"
+                                    className="h-8 w-10"
                                     style={{ fill: "#0071e3" }}
                                 />
                                 <p className="text-sm text-black">iCloud Settings</p>
                             </div>
 
-                            <div className="ml-1 flex w-full items-center">
+                            <div className="mb-1 mt-3 flex w-full items-center rounded-customHalf hover:bg-appleGray">
                                 <SettingUserIcon
-                                    className="h-10 w-10"
+                                    className="h-8 w-10"
                                     style={{ fill: "#0071e3" }}
                                 />
                                 <p className="text-sm text-appleBlue">Manage Apple ID</p>
                                 <LinkArrowIcon
-                                    className="-ml-1 h-8 w-8"
+                                    className="-ml-1 h-7 w-8"
                                     style={{ fill: "#0071e3" }}
                                 />
                             </div>
                         </div>
 
+                        <div className="border-t border-custom mb-1 ml-2 mr-2">
+                        </div>
+
                         <div
-                            className="px-2"
-                            onClick={async () => {
-                                setLoading(true);
-                                await signOut({ callbackUrl: "/" });
-                                setLoading(false);
-                            }}
+                            className="px-1"
+                            onClick={handleSignOut}
                         >
-                            <div className="flex w-full items-center border-t border-custom">
+                            <div className="flex w-full items-center rounded-customHalf hover:bg-appleGray mb-1">
                                 <CloseIcon
-                                    className="-ml-1 h-10 w-10"
+                                    className="h-8 w-10"
                                     style={{ fill: "#e30000" }}
                                 />
                                 <p className="text-sm text-appleRed">Sign Out</p>
