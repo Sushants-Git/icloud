@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { FormEvent, useRef, useState } from "react";
 import { api } from "~/trpc/react";
 import Loading from "./Loading";
+import { useLoadingStore } from "~/stores/useLoadingStore";
 
 interface NameDialogProps {
     userId: string;
@@ -10,7 +11,7 @@ interface NameDialogProps {
 
 const NameDialog: React.FC<NameDialogProps> = ({ userId }) => {
     const [name, setName] = useState("");
-    const [loading, setLoading] = useState(false);
+    const {setLoading, isLoading} = useLoadingStore();
     const retryCount = useRef(0);
     const { update } = useSession();
 
@@ -40,7 +41,7 @@ const NameDialog: React.FC<NameDialogProps> = ({ userId }) => {
         await addNameMutation.mutateAsync({ userId, name });
     };
 
-    if (loading) {
+    if (isLoading) {
         return <Loading />;
     }
 
