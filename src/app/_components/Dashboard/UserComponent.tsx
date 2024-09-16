@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useLoadingStore } from "~/stores/useLoadingStore";
 import { motion, AnimatePresence } from "framer-motion";
 import UserIconNav from "./Images/user-icon-nav.svg";
@@ -10,12 +10,17 @@ import SettingsIcon from "./Images/settings.svg";
 import CloseIcon from "./Images/close.svg";
 import LinkArrowIcon from "./Images/link-arrow.svg";
 
-export default function UserComponent() {
-    return <UserPopup />;
+interface isHomeScreenProps {
+    isforHomeScreen: boolean;
 }
 
-function UserPopup() {
+export default function UserComponent({isforHomeScreen}: isHomeScreenProps) {
+    return <UserPopup isforHomeScreen={isforHomeScreen} />;
+}
+
+const UserPopup: React.FC<isHomeScreenProps> = ({ isforHomeScreen }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const { data: session } = useSession();
     const { setLoading } = useLoadingStore();
 
     const handleSignOut = () => {
@@ -30,12 +35,25 @@ function UserPopup() {
             });
     };
 
-    return (
-        <div className="relative">
+    let userIconNav = (
+        <UserIconNav
+            style={{ fill: !isOpen ? "white" : "#32323233" }}
+            onClick={() => setIsOpen((isOpen) => !isOpen)}
+        />
+    );
+
+    if (!isforHomeScreen) {
+        userIconNav = (
             <UserIconNav
-                style={{ fill: !isOpen ? "white" : "#32323233" }}
+                style={{ fill: !isOpen ? "black" : "white" }}
                 onClick={() => setIsOpen((isOpen) => !isOpen)}
             />
+        );
+    }
+
+    return (
+        <div className="relative">
+            {userIconNav}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -54,8 +72,8 @@ function UserPopup() {
                     >
                         <div className="rounded-t-custom border-b border-custom bg-appleGray py-4">
                             <div className="-mb-1 ml-4">
-                                <h3 className="font-semibold text-black">Sushant Mishra</h3>
-                                <p className="text-sm text-gray-500">sushantsgml@gmail.com</p>
+                                <h3 className="font-semibold text-black">{session?.user.name}</h3>
+                                <p className="text-sm text-gray-500">{session?.user.email}</p>
                             </div>
                         </div>
 

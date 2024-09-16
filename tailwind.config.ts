@@ -11,9 +11,16 @@ export default {
             backgroundColor: {
                 appleBlue: "#0071e3",
                 appleRed: "#e30000",
-                appleGray: "#aaaaae26"
+                // No i am not crazy they literally have 
+                // so many shades of gray
+                appleNavbarGray: "#f5f5f7",
+                appleGray: "#aaaaae26",
+                appleGrayishBlue: "#dceefd",
+                appleDarkGray: "#00000014",
+                hoverGray: "#00000014"
             },
             textColor: {
+                appleGray: "#0000008f",
                 appleBlue: "#0071e3",
                 appleRed: "#e30000",
             },
