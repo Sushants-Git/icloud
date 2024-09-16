@@ -20,9 +20,14 @@ function UserPopup() {
 
     const handleSignOut = () => {
         setLoading(true);
-        signOut({ callbackUrl: "/" }).then(() => {
-            setLoading(false);
-        });
+        signOut({ callbackUrl: "/" })
+            .then(() => {
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("Sign out failed", error);
+                setLoading(false);
+            });
     };
 
     return (
