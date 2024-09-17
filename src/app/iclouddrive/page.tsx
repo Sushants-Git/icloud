@@ -147,7 +147,7 @@ const ContentArea: React.FC = () => (
         <div className="flex flex-grow flex-col items-center justify-center">
             <h2 className="mb-4 text-3xl font-semibold text-gray-400">No items</h2>
             <p className="text-gray-400">
-                Files which you've opened recently will appear here.
+                Files which youve opened recently will appear here.
             </p>
         </div>
     </div>
