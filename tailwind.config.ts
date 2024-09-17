@@ -4,20 +4,27 @@ import { fontFamily } from "tailwindcss/defaultTheme";
 export default {
     content: ["./src/**/*.tsx"],
     theme: {
+        borderColor: {
+            appleGray: "#e6e6ea"
+        },
         extend: {
+            fill: {
+                appleBlue: "#0071e3",
+            },
             borderColor: {
-                custom: "#aaaaae4d"
+                custom: "#aaaaae4d",
             },
             backgroundColor: {
                 appleBlue: "#0071e3",
                 appleRed: "#e30000",
-                // No i am not crazy they literally have 
+                appleSidebarblue: "#fbfbfd",
+                // No i am not crazy they literally have
                 // so many shades of gray
                 appleNavbarGray: "#f5f5f7",
                 appleGray: "#aaaaae26",
                 appleGrayishBlue: "#dceefd",
                 appleDarkGray: "#00000014",
-                hoverGray: "#00000014"
+                hoverGray: "#00000014",
             },
             textColor: {
                 appleGray: "#0000008f",
