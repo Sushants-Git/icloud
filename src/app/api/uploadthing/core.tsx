@@ -2,6 +2,7 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { auth, getServerAuthSession } from "~/server/auth";
 import { insertFilesMetaDataToDb } from "~/server/queries";
+import { UTApi } from "uploadthing/server";
 
 const f = createUploadthing();
 
@@ -12,7 +13,6 @@ export const ourFileRouter = {
         image: { maxFileSize: "64MB", maxFileCount: 10 },
         text: { maxFileSize: "64MB", maxFileCount: 10 },
         pdf: { maxFileSize: "64MB", maxFileCount: 10 },
-        blob: { maxFileSize: "64MB", maxFileCount: 10 },
     })
         // Set permissions and file types for this FileRoute
         .middleware(async ({ req }) => {
@@ -27,8 +27,8 @@ export const ourFileRouter = {
             console.log(user);
 
             if (!user?.id)
-                throw new UploadThingError(
-                    `Unauthorizedddddddd ${JSON.stringify(user)}`,
+                throw new Error(
+                    `Unauthorizeddd Access`,
                 );
 
             // Whatever is returned here is accessible in onUploadComplete as `metadata`
@@ -52,8 +52,10 @@ export const ourFileRouter = {
             // const posts = await db.query.users.findMany();
 
             // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+            console.log("file key", file.key);
             return { fileId: file.key };
         }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;
+export const utapi = new UTApi();

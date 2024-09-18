@@ -46,4 +46,16 @@ function humanReadableSize(bytes: number): string {
     return `${formattedSize} ${sizes[i]}`;
 }
 
-export { getFormattedTimestamp, humanReadableSize };
+function subtractFromGB(fromInGB = 1, bytesToSubtract: number) {
+    const oneGBInBytes = fromInGB * 1024 ** 3;
+
+    const remainingBytes = oneGBInBytes - bytesToSubtract;
+
+    const remainingGB = (remainingBytes / 1024 ** 3).toFixed(2);
+
+    return remainingGB;
+}
+
+
+
+export { getFormattedTimestamp, humanReadableSize, subtractFromGB };

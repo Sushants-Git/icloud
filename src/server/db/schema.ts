@@ -21,10 +21,7 @@ import { type AdapterAccount } from "next-auth/adapters";
 export const createTable = pgTableCreator((name) => `icloud_${name}`);
 
 export const users = createTable("user", {
-    id: varchar("id", { length: 255 })
-        .notNull()
-        .primaryKey()
-        .$defaultFn(() => crypto.randomUUID()),
+    id: varchar("id", { length: 255 }).notNull().primaryKey(),
     name: varchar("name", { length: 255 }),
     email: varchar("email", { length: 255 }).notNull(),
     emailVerified: timestamp("email_verified", {
@@ -132,22 +129,21 @@ export const verificationTokens = createTable(
 );
 
 export const files = createTable('files', {
-    id: varchar('id', { length: 255 })
+    id: varchar('id', { length: 1024 })
         .notNull()
-        .primaryKey()
-        .$defaultFn(() => crypto.randomUUID()), 
-    name: varchar('name', { length: 255 }).notNull(), 
-    type: varchar('kind', { length: 255 }).notNull(), 
-    size: integer('size').notNull(), 
+        .primaryKey(),
+    name: varchar('name', { length: 255 }).notNull(),
+    type: varchar('kind', { length: 255 }).notNull(),
+    size: integer('size').notNull(),
     date: timestamp('date', { mode: 'date', withTimezone: true })
-        .default(sql`CURRENT_TIMESTAMP`), 
-    url: varchar('url', { length: 1024  }).notNull(),
+        .default(sql`CURRENT_TIMESTAMP`),
+    url: varchar('url', { length: 1024 }).notNull(),
     userId: varchar('user_id', { length: 255 })
         .notNull()
         .references(() => users.id, { onDelete: 'cascade' }) // Foreign key to users table
 },
-(files) => ({
-    userIdIdx: index('files_user_id_idx').on(files.userId),
-    nameIdx: index('files_name_idx').on(files.name),
-    typeIdx: index('files_kind_idx').on(files.type)
-}));
+    (files) => ({
+        userIdIdx: index('files_user_id_idx').on(files.userId),
+        nameIdx: index('files_name_idx').on(files.name),
+        typeIdx: index('files_kind_idx').on(files.type)
+    }));

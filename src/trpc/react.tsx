@@ -44,7 +44,7 @@ export type RouterOutputs = inferRouterOutputs<AppRouter>;
 // Which is bad, so gotta fix this later.
 // this was meant to be (let XAPIKey: string = ""; 
 
-export let XApiKey: string = "f7695f9920bf637b831a2c2d497182d86f31216c4b941f12408b5501cdbf3e05";
+export let XApiKey = "f7695f9920bf637b831a2c2d497182d86f31216c4b941f12408b5501cdbf3e05";
 
 export const setXApiKey = (apiKey: string) => {
     XApiKey = apiKey;

@@ -9,6 +9,8 @@ export default withUt({
             fill: {
                 appleBlue: "#0071e3",
                 appleRed: "#ff3b30",
+                applePurple: "#af52de",
+                appleSelectGray: "#00000052",
             },
             borderColor: {
                 appleGray: "#e6e6ea",

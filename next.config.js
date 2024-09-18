@@ -6,14 +6,17 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
-    webpack(config) {
-        config.module.rules.push({
-            test: /\.svg$/,
-            use: ['@svgr/webpack'],
-        });
+  images: {
+    remotePatterns: [{ hostname: "utfs.io" }],
+  },
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ["@svgr/webpack"],
+    });
 
-        return config;
-    },
+    return config;
+  },
 };
 
 export default config;
