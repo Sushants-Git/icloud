@@ -36,7 +36,15 @@ export type RouterInputs = inferRouterInputs<AppRouter>;
  */
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
-export let XApiKey: string;
+// TODO : This key is set dynamically, but since the 
+// x-api-key header is necessary in every request i would need to 
+// make sure that the header is set before any request
+// that includes requests made to fetch inital data
+// making me use the useApiKey hook before every request.
+// Which is bad, so gotta fix this later.
+// this was meant to be (let XAPIKey: string = ""; 
+
+export let XApiKey: string = "f7695f9920bf637b831a2c2d497182d86f31216c4b941f12408b5501cdbf3e05";
 
 export const setXApiKey = (apiKey: string) => {
     XApiKey = apiKey;

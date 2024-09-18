@@ -20,27 +20,6 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `icloud_${name}`);
 
-export const posts = createTable(
-    "post",
-    {
-        id: serial("id").primaryKey(),
-        name: varchar("name", { length: 256 }),
-        createdById: varchar("created_by", { length: 255 })
-            .notNull()
-            .references(() => users.id),
-        createdAt: timestamp("created_at", { withTimezone: true })
-            .default(sql`CURRENT_TIMESTAMP`)
-            .notNull(),
-        updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-            () => new Date(),
-        ),
-    },
-    (post) => ({
-        createdByIdIdx: index("created_by_idx").on(post.createdById),
-        nameIndex: index("name_idx").on(post.name),
-    }),
-);
-
 export const users = createTable("user", {
     id: varchar("id", { length: 255 })
         .notNull()
@@ -151,3 +130,24 @@ export const verificationTokens = createTable(
         compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
     }),
 );
+
+export const files = createTable('files', {
+    id: varchar('id', { length: 255 })
+        .notNull()
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()), 
+    name: varchar('name', { length: 255 }).notNull(), 
+    type: varchar('kind', { length: 255 }).notNull(), 
+    size: integer('size').notNull(), 
+    date: timestamp('date', { mode: 'date', withTimezone: true })
+        .default(sql`CURRENT_TIMESTAMP`), 
+    url: varchar('url', { length: 1024  }).notNull(),
+    userId: varchar('user_id', { length: 255 })
+        .notNull()
+        .references(() => users.id, { onDelete: 'cascade' }) // Foreign key to users table
+},
+(files) => ({
+    userIdIdx: index('files_user_id_idx').on(files.userId),
+    nameIdx: index('files_name_idx').on(files.name),
+    typeIdx: index('files_kind_idx').on(files.type)
+}));

@@ -1,17 +1,17 @@
+import { withUt } from "uploadthing/tw";
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 
-export default {
+export default withUt({
     content: ["./src/**/*.tsx"],
     theme: {
-        borderColor: {
-            appleGray: "#e6e6ea"
-        },
         extend: {
             fill: {
                 appleBlue: "#0071e3",
+                appleRed: "#ff3b30",
             },
             borderColor: {
+                appleGray: "#e6e6ea",
                 custom: "#aaaaae4d",
             },
             backgroundColor: {
@@ -27,6 +27,7 @@ export default {
                 hoverGray: "#00000014",
             },
             textColor: {
+                appleTableGray: "#76767b",
                 appleGray: "#0000008f",
                 appleBlue: "#0071e3",
                 appleRed: "#e30000",
@@ -66,4 +67,4 @@ export default {
         },
     },
     plugins: [],
-} satisfies Config;
+}) satisfies Config;

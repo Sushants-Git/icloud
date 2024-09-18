@@ -1,29 +1,21 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useMemo } from "react";
-import { api, setXApiKey } from "~/trpc/react";
+import { useMemo } from "react";
 
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Loading from "./common/Loading";
 import NameDialog from "./NameDialog";
 import { useLoadingStore } from "~/stores/useLoadingStore";
+import useApiKey from "~/hooks/useApiKey";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
+
+  useApiKey();
+
   const { isLoading } = useLoadingStore();
-  const fetchedKeyData = api.apiKey.getKey.useQuery(undefined, {
-    enabled: !!session,
-    refetchOnWindowFocus: false,
-  });
-
-  useEffect(() => {
-    if (fetchedKeyData.data) {
-      setXApiKey(fetchedKeyData.data.apiKey);
-    }
-  }, [fetchedKeyData.data]);
-
   const renderedContent = useMemo(() => {
     if (status === "loading" || isLoading) return <Loading />;
     if (status === "unauthenticated") return <Login />;
