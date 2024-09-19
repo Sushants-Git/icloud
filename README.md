@@ -76,7 +76,7 @@ turbo build
 ## How to call the `/api/users`
 
 ```bash
-curl -X GET "http://icloud-huddle01.vercel.app/api/trpc/user.getAllUsers" \
+curl -X GET "https://icloud-huddle01.vercel.app/api/trpc/user.getAllUsers" \
      -H "Content-Type: application/json" \
      -H "x-api-key: f7695f9920bf637b831a2c2d497182d86f31216c4b941f12408b5501cdbf3e05"
 ```
