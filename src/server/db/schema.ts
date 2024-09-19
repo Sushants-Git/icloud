@@ -21,7 +21,10 @@ import { type AdapterAccount } from "next-auth/adapters";
 export const createTable = pgTableCreator((name) => `icloud_${name}`);
 
 export const users = createTable("user", {
-    id: varchar("id", { length: 255 }).notNull().primaryKey(),
+    id: varchar("id", { length: 255 })
+        .$defaultFn(() => crypto.randomUUID())
+        .notNull()
+        .primaryKey(),
     name: varchar("name", { length: 255 }),
     email: varchar("email", { length: 255 }).notNull(),
     emailVerified: timestamp("email_verified", {

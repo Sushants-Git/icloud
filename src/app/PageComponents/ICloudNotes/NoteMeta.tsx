@@ -14,7 +14,7 @@ const NotesMeta: React.FC<{
                 setCurrentNote(id)
             }}>
                 <h3 className="line-clamp-1 break-all text-lg font-semibold">
-                    {title}
+                    {title || 'New Note'}
                 </h3>
                 <p className="text-sm text-gray-500">{getTimeFromDate(date)} No additional text</p>
                 <div className="mt-1 flex items-center gap-1">

@@ -1,121 +1,126 @@
 import { useNotesStore } from "~/stores/useNotesStore";
 import { AddNotes, Delete } from "./NotesIcons";
 import { api } from "~/trpc/react";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import Loading from "~/app/_components/common/Loading";
+import { debounce } from "lodash";
 
 const ContentArea: React.FC = () => {
+    const { setCurrentNote, currentNote, deleteNote, updateCurrentNote } =
+        useNotesStore();
     const utils = api.useUtils();
-    const { setCurrentNote, currentNote, deleteNote } = useNotesStore();
-    const util = api.useUtils();
+
+    const [loading, setLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const addNoteMutation = api.notes.addNote.useMutation({
         onSuccess: ({ noteId }) => {
             setCurrentNote(noteId);
-            util.notes.getNotes.invalidate().then(() => {
-                console.log("Notes invalidated");
-            }).catch((error) => {
-                console.error("Error invalidating notes:", error);
-            })
+            utils.notes.getNotes
+                .invalidate()
+                .then(() => {
+                    console.log("Notes refetched");
+                })
+                .catch((error) => {
+                    console.error("Error refetching notes:", error);
+                });
+            setLoading(false);
+        },
+        onError: (error) => {
+            setLoading(false);
+            console.error("Error adding note:", error);
         },
     });
 
-    const editMutation = api.notes.editNote.useMutation();
+    const editMutation = api.notes.editNote.useMutation({
+        onSuccess: () => {
+            utils.notes.getNotes
+                .invalidate()
+                .then(() => {
+                    console.log("Notes refetched");
+                })
+                .catch((error) => {
+                    console.error("Error refetching notes:", error);
+                });
+        },
+    });
 
     const deleteNoteMutation = api.notes.deleteNote.useMutation({
         onSuccess: () => {
-            util.notes.getNotes.invalidate().then(() => {
-                console.log("Notes invalidated");
-            }).catch((error) => {
-                console.error("Error invalidating notes:", error);
-            })
+            utils.notes.getNotes
+                .invalidate()
+                .then(() => {
+                    console.log("Notes refetched");
+                })
+                .catch((error) => {
+                    console.error("Error refetching notes:", error);
+                });
+            setIsDeleting(false);
+        },
+        onError: (error) => {
+            console.error("Error deleting note:", error);
+            setIsDeleting(false);
         },
     });
 
-    const [tempNoteText, setTempNoteText] = useState({
-        id: currentNote?.id,
-        content: currentNote?.content ?? "",
-    });
+    const debouncedEdit = useCallback(
+        debounce((noteId: string, title: string, content: string) => {
+            editMutation.mutate({ noteId, title, content });
+        }, 500),
+        [],
+    );
 
-    useEffect(() => {
-        if (currentNote?.id !== tempNoteText.id) {
-            setTempNoteText({
-                id: currentNote?.id,
-                content: currentNote?.content ? currentNote.content : "",
-            });
-        }
+    const handleNoteChange = (content: string) => {
+        if (!currentNote) return;
 
-        const id = setTimeout(() => {
-            if (currentNote === null) return;
-            editMutation.mutate({
-                noteId: currentNote.id,
-                title: tempNoteText.content.split(" ").slice(0, 10).join(" "),
-                content: tempNoteText.content,
-            });
-            util.notes.getNotes.invalidate().then(() => {
-                console.log("Notes invalidated");
-            }).catch((error) => {
-                console.error("Error invalidating notes:", error);
-            })
-        }, 500);
+        const title = content.split(" ").slice(0, 10).join(" ");
+        updateCurrentNote(currentNote.id, { ...currentNote, content, title });
+        debouncedEdit(currentNote.id, title, content);
+    };
 
-        return () => clearTimeout(id);
-    }, [tempNoteText, currentNote]);
+    const handleDeleteNote = () => {
+        if (!currentNote) return;
+
+        setIsDeleting(true);
+        setCurrentNote(null);
+        deleteNote(currentNote.id);
+
+        deleteNoteMutation.mutate({ noteId: currentNote.id });
+    };
+
+    const handleAddNote = () => {
+        setLoading(true);
+        addNoteMutation.mutate({ title: "New Note", content: "" });
+    };
 
     return (
         <div className="h-full w-full overflow-hidden">
             <div className="sticky top-0 flex items-center justify-end gap-2">
                 <Delete
-                    className="mr-2 mt-2 h-5 w-5 cursor-pointer rounded-md fill-appleYellow p-2 hover:bg-hoverGray"
-                    onClick={() => {
-                        if (currentNote === null) return;
-                        deleteNoteMutation
-                            .mutateAsync({ noteId: currentNote.id })
-                            .then(async () => {
-                                await util.notes.getNotes.invalidate();
-                            })
-                            .catch((error) => {
-                                console.error("Error deleting file:", error);
-                            });
-
-                        setCurrentNote(null);
-
-                        if (currentNote) {
-                            deleteNote(currentNote?.id);
-                        }
-                    }}
+                    className={`mr-2 mt-2 h-5 w-5 cursor-pointer rounded-md fill-appleYellow p-2 hover:bg-hoverGray ${isDeleting ? "opacity-50" : ""}`}
+                    onClick={handleDeleteNote}
+                    disabled={isDeleting}
                 />
-                <div>
-                    <AddNotes
-                        className="mr-2 mt-2 h-5 w-5 cursor-pointer rounded-md fill-appleYellow p-2 hover:bg-hoverGray"
-                        onClick={() => {
-                            addNoteMutation.mutate({ title: "New Note", content: "" });
-                        }}
-                    />
-                </div>
+                <AddNotes
+                    className="mr-2 mt-2 h-5 w-5 cursor-pointer rounded-md fill-appleYellow p-2 hover:bg-hoverGray"
+                    onClick={handleAddNote}
+                />
             </div>
             <div className="h-full max-h-full">
-                {currentNote ? (
+                {loading ? (
+                    <div className="flex h-full items-center justify-center">
+                        <Loading />
+                    </div>
+                ) : currentNote ? (
                     <textarea
                         className="custom-area h-full w-full flex-grow resize-none overflow-y-auto bg-white p-4 text-xl focus:outline-none"
                         style={{ caretColor: "#F1C100" }}
                         placeholder="Type your notes here..."
-                        value={
-                            tempNoteText.content === ""
-                                ? currentNote?.content
-                                : tempNoteText.content
-                        }
-                        onChange={(e) => {
-                            setTempNoteText((state) => {
-                                return {
-                                    ...state,
-                                    content: e.target.value,
-                                };
-                            });
-                        }}
+                        value={currentNote.content}
+                        onChange={(e) => handleNoteChange(e.target.value)}
                     />
                 ) : (
-                    <div className="flex h-full w-full items-center justify-center text-2xl text-gray-500">
-                        Select a note to view or create a new note
-                    </div>
+                    <ShowMessage />
                 )}
             </div>
             <style>
@@ -129,5 +134,11 @@ const ContentArea: React.FC = () => {
         </div>
     );
 };
+
+const ShowMessage: React.FC = () => (
+    <div className="flex h-full w-full items-center justify-center text-2xl text-gray-500">
+        Select a note to view or create a new note
+    </div>
+);
 
 export default ContentArea;

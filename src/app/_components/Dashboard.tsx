@@ -157,7 +157,7 @@ const NotesComponent = () => {
             {fetchedNotes?.data?.notes?.length === 0 ? (
                 <Link href="/icloudnotes">
                     <div className="flex h-[235px] w-full flex-col items-center justify-center">
-                        <FirstUploadSvg className="h-16 w-16 fill-appleBlue" />
+                        <FirstUploadSvg className="h-16 w-16 fill-appleYellow" />
                         <p>Create your first note</p>
                     </div>
                 </Link>
