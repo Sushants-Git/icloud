@@ -19,9 +19,10 @@ cd icloud
 bun install
 ```
 
-4. Add `.env`, you can take a look at `.env.example` for reference.
+4. Configure Environment
+    - Add `.env`, you can take a look at `.env.example` for reference.
 
-5. Setup the db
+5. Set Up the Database
 ```bash
 turbo dev db:push
 ```
@@ -31,14 +32,13 @@ turbo dev db:push
 turbo run dev
 ```
 
-7. To Build
+7. Build the Project
 ```bash
 turbo build
 ```
 
 ## Assumptions
-- I am assuming that the `x-api-key` was meant to be mostly so that someone who has proper access can access the data without needing to login.
-- Therefore i did not focus much on it's handling, initally i set it up dynamically whenever the user logged in and then send it with every subsiquient request, but then i realised then i would need to make sure that no request goes out before it, since they all would need the `x-api-key` header, making the request, response cycle kinda slow, so gave up on that.
+- I initially set up the x-api-key to be generated dynamically from the server when a user logs in. However, this meant I had to ensure the key was set up before every request, which could slow things down. So, I decided to abandon that approach. ( I am assuming the main purpsose of the `x-api-key` is just to be able to query the `db` externally without loging in, thought i would let you know this since there will be some deadcode regarding this in the codebase)
 
 ## DB Schema
 
@@ -76,9 +76,9 @@ turbo build
 ## How to call the `/api/users`
 
 ```bash
-curl -X GET "http://localhost:3000/api/trpc/user.getAllUsers" \
+curl -X GET "http://icloud-huddle01.vercel.app/api/trpc/user.getAllUsers" \
      -H "Content-Type: application/json" \
      -H "x-api-key: f7695f9920bf637b831a2c2d497182d86f31216c4b941f12408b5501cdbf3e05"
 ```
 
-- Since the api key was asked to be hardcoded, i am also putting it here.
+- Since the api key was asked to be hardcoded, i am also putting it here as well.
