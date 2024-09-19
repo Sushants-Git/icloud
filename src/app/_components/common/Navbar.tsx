@@ -3,6 +3,7 @@ import Link from "next/link";
 import ICloudWhiteLogo from "/public/icons/icloud-white-logo.svg";
 import ICloudBlackLogo from "/public/icons/icloud-black-logo.svg";
 import DriveLogo from "/public/drive-icons/drive.svg";
+import NotesLogo from "/public/notes-icons/notes.svg";
 
 import UserComponent from "./UserComponent";
 
@@ -33,6 +34,10 @@ const Logo: React.FC<NavbarProps> = ({ isforHomeScreen, withTitle }) => {
     switch (withTitle) {
         case "Drive": {
             logo = <DriveLogo className="text-xl font-semibold" />;
+            break;
+        }
+        case "Notes" : {
+            logo = <NotesLogo className="text-xl font-semibold" />;
         }
     }
 

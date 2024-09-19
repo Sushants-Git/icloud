@@ -128,22 +128,46 @@ export const verificationTokens = createTable(
     }),
 );
 
-export const files = createTable('files', {
-    id: varchar('id', { length: 1024 })
-        .notNull()
-        .primaryKey(),
-    name: varchar('name', { length: 255 }).notNull(),
-    type: varchar('kind', { length: 255 }).notNull(),
-    size: integer('size').notNull(),
-    date: timestamp('date', { mode: 'date', withTimezone: true })
-        .default(sql`CURRENT_TIMESTAMP`),
-    url: varchar('url', { length: 1024 }).notNull(),
-    userId: varchar('user_id', { length: 255 })
-        .notNull()
-        .references(() => users.id, { onDelete: 'cascade' }) // Foreign key to users table
-},
+export const files = createTable(
+    "files",
+    {
+        id: varchar("id", { length: 1024 }).notNull().primaryKey(),
+        name: varchar("name", { length: 255 }).notNull(),
+        type: varchar("kind", { length: 255 }).notNull(),
+        size: integer("size").notNull(),
+        date: timestamp("date", { mode: "date", withTimezone: true }).default(
+            sql`CURRENT_TIMESTAMP`,
+        ),
+        url: varchar("url", { length: 1024 }).notNull(),
+        userId: varchar("user_id", { length: 255 })
+            .notNull()
+            .references(() => users.id, { onDelete: "cascade" }), // Foreign key to users table
+    },
     (files) => ({
-        userIdIdx: index('files_user_id_idx').on(files.userId),
-        nameIdx: index('files_name_idx').on(files.name),
-        typeIdx: index('files_kind_idx').on(files.type)
-    }));
+        userIdIdx: index("files_user_id_idx").on(files.userId),
+        nameIdx: index("files_name_idx").on(files.name),
+        typeIdx: index("files_kind_idx").on(files.type),
+    }),
+);
+
+export const notes = createTable(
+    "notes",
+    {
+        id: varchar("id", { length: 1024 })
+            .notNull()
+            .primaryKey()
+            .$defaultFn(() => crypto.randomUUID()),
+        title: varchar("title", { length: 255 }).notNull(),
+        content: text("content").notNull(),
+        userId: varchar("user_id", { length: 255 })
+            .notNull()
+            .references(() => users.id, { onDelete: "cascade" }),
+        date: timestamp("date", { mode: "date", withTimezone: true }).default(
+            sql`CURRENT_TIMESTAMP`,
+        ),
+    },
+    (notes) => ({
+        userIdIdx: index("notes_user_id_idx").on(notes.userId),
+        titleIdx: index("notes_title_idx").on(notes.title),
+    }),
+);

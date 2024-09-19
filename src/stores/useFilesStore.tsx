@@ -16,13 +16,6 @@ export interface filesState {
     setFetchedFiles: (files: fetchedFiles[]) => void;
 }
 
-// export const useFilesStore = create<filesState>((set) => ({
-//   fetchedFiles: [],
-//   setFetchedFiles: (files: fetchedFiles[]) => set({ fetchedFiles: files }),
-// }));
-
-// fetchedFiles.filter((file) => file.id !== openForId),
-
 export const useFilesStore = create<filesState>((set) => ({
     fetchedFiles: [],
     removeFile: (openForId: string) => {

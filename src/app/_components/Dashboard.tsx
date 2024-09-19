@@ -5,13 +5,17 @@ import ClockSvg from "/public/clock.svg";
 import PdfSvg from "/public/drive-icons/pdf.svg";
 import TextSvg from "/public/drive-icons/text.svg";
 import ImageSvg from "/public/drive-icons/image.svg";
-
-import Delete from "/public/drive-icons/delete.svg";
+import FirstUploadSvg from "/public/drive-icons/upload-your-first.svg";
+import { Browse } from "../PageComponents/ICloudDrive/DriveIcons";
 
 import Navbar from "./common/Navbar";
 import { useFiles } from "~/hooks/useFiles";
-import React from "react";
+import React, { useEffect } from "react";
 import { fetchedFiles } from "~/stores/useFilesStore";
+import { api } from "~/trpc/react";
+import { useNotesStore } from "~/stores/useNotesStore";
+import { useSession } from "next-auth/react";
+import NotesMeta from "../PageComponents/ICloudNotes/NoteMeta";
 
 const boxEffect = "h-[315px] w-[315px] rounded-[16px] bg-white";
 const transaction =
@@ -59,7 +63,7 @@ const GridLayout = () => (
                 <DriveComponent />
             </Box>
             <Box additionalClasses="lg:w-[315px]">
-                <div></div>
+                <NotesComponent />
             </Box>
         </div>
     </div>
@@ -67,7 +71,6 @@ const GridLayout = () => (
 
 const DriveComponent = () => {
     const { fetchedFiles } = useFiles();
-    console.log(fetchedFiles);
 
     return (
         <>
@@ -91,14 +94,89 @@ const DriveComponent = () => {
                     </div>
                 </Link>
             </div>
-            <div className="mt-5 flex">
-                <div className="flex-grow pl-2 pr-2 w-1/2">
-                    {FirstNFiles({ from: 0, to: 3, files: fetchedFiles })}
-                </div>
-                <div className="flex-grow border-l border-l-appleGray pl-2 pr-2 w-1/2">
-                    {FirstNFiles({ from: 3, to: 6, files: fetchedFiles })}
-                </div>
+            {fetchedFiles.length === 0 ? (
+                <Link href="/iclouddrive">
+                    <div className="flex h-[235px] w-full flex-col items-center justify-center">
+                        <FirstUploadSvg className="h-16 w-16 fill-appleBlue" />
+                        <p>Upload your first file</p>
+                    </div>
+                </Link>
+            ) : (
+                <>
+                    <div className="mt-5 flex">
+                        <div className="w-1/2 flex-grow pl-2 pr-2">
+                            {FirstNFiles({ from: 0, to: 3, files: fetchedFiles })}
+                        </div>
+                        <div className="w-1/2 flex-grow border-l border-l-appleGray pl-2 pr-2">
+                            {FirstNFiles({ from: 3, to: 6, files: fetchedFiles })}
+                        </div>
+                    </div>
+                </>
+            )}
+        </>
+    );
+};
+
+const NotesComponent = () => {
+    const { setNotes, notes } = useNotesStore();
+
+    const { data: session } = useSession();
+
+    const fetchedNotes = api.notes.getNotes.useQuery(undefined, {
+        enabled: !!session,
+    });
+
+    useEffect(() => {
+        if (fetchedNotes.data) {
+            setNotes(fetchedNotes.data.notes);
+        }
+    }, [fetchedNotes.data]);
+
+    return (
+        <>
+            <div className="flex h-20 rounded-t-[16px] bg-appleGrayishBlue">
+                <Link href="/icloudnotes" className="flex w-full rounded-t-[16px]">
+                    <div className="m-2 flex w-full items-center rounded-[8px] px-1 pl-4 hover:bg-appleDarkGray">
+                        <Image
+                            src="/icloud-notes-logo.png"
+                            className="block"
+                            alt="logo"
+                            width={40}
+                            height={40}
+                        />
+                        <div className="ml-3 flex flex-col">
+                            <p className="-mb-0.5 text-xl font-semibold">Notes</p>
+                            <p className="flex items-center gap-0.5 text-sm text-appleGray">
+                                <Browse className="mr-1 h-3 w-4 fill-appleYellow" />
+                                Browse
+                            </p>
+                        </div>
+                    </div>
+                </Link>
             </div>
+            {fetchedNotes?.data?.notes?.length === 0 ? (
+                <Link href="/icloudnotes">
+                    <div className="flex h-[235px] w-full flex-col items-center justify-center">
+                        <FirstUploadSvg className="h-16 w-16 fill-appleBlue" />
+                        <p>Create your first note</p>
+                    </div>
+                </Link>
+            ) : (
+                <>
+                    <div className="mt-5 flex">
+                        <div className="flex w-full flex-grow flex-col gap-2 pl-2 pr-2">
+                            {notes.slice(0, 2).map((note) => (
+                                <NotesMeta
+                                    key={note.id}
+                                    id={note.id}
+                                    title={note.title}
+                                    date={note.date}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </>
+            )}
         </>
     );
 };
@@ -128,7 +206,7 @@ const FileItem: React.FC<{ file: fetchedFiles }> = ({ file }) => {
             console.log("The file is a text file.");
             break;
         case String(fileType).includes("image"):
-            logo = <ImageSvg className="fill-appleYellow h-5" />;
+            logo = <ImageSvg className="h-5 fill-appleYellow" />;
             break;
         case String(fileType).includes("pdf"):
             logo = <PdfSvg className="h-5 fill-appleRed" />;
@@ -138,15 +216,14 @@ const FileItem: React.FC<{ file: fetchedFiles }> = ({ file }) => {
     }
 
     return (
-        <Link
-            href={file.url}
-            target="_blank"
-        >
-            <div className="flex items-center gap-4 hover:bg-appleGray  hover:rounded-lg cursor-pointer pl-4 pr-4">
+        <Link href={file.url} target="_blank">
+            <div className="flex cursor-pointer items-center gap-4 pl-4 pr-4 hover:rounded-lg hover:bg-appleGray">
                 <div>{logo}</div>
                 <div>
-                    <div className="line-clamp-1 text-base break-all">{file.name}</div>
-                    <div className="text-sm font-regular text-appleTableGray">{file.type}</div>
+                    <div className="line-clamp-1 break-all text-base">{file.name}</div>
+                    <div className="text-sm font-regular text-appleTableGray">
+                        {file.type}
+                    </div>
                 </div>
             </div>
         </Link>
